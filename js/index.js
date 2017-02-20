@@ -6,19 +6,19 @@ $(document).ready(function() {
   // ---FUNCTIONS--- //
 
   function add(firstNumber, secondNumber) {
-    return firstNumber + secondNumber;
+    return parseInt(firstNumber) + parseInt(secondNumber);
   }
 
   function subtract(firstNumber, secondNumber) {
-    return firstNumber - secondNumber;
+    return parseInt(firstNumber) - parseInt(secondNumber);
   }
 
   function multiply(firstNumber, secondNumber) {
-    return firstNumber * secondNumber;
+    return parseInt(firstNumber) * parseInt(secondNumber);
   }
 
   function divide(firstNumber, secondNumber) {
-    return firstNumber / secondNumber;
+    return parseInt(firstNumber) / parseInt(secondNumber);
   }
 
   function evaluateExpression(expression, operator, action) {
@@ -33,6 +33,7 @@ $(document).ready(function() {
   }
 
   function displayResult() {
+    state = 'result';
     let expression = ($('#screen').text());
     if (expression.includes('x')) {
       let result = evaluateExpression(expression, 'x', multiply);
@@ -45,12 +46,12 @@ $(document).ready(function() {
     else if (expression.includes('+')) {
       let result = evaluateExpression(expression, '+', add);
       ($('#screen')).text(result);
+      console.log(result);
     }
     else if (expression.includes('-')) {
       let result = evaluateExpression(expression, '-', subtract);
       ($('#screen')).text(result);
     }
-    state = 'result';
   }
 
   // ---EVENTS--- //
@@ -67,14 +68,22 @@ $(document).ready(function() {
     }
 
     else if (target.tagName === 'SPAN') {
-      if (state === 'result' && !$(target).hasClass('operator')) {
+      if (state === 'result' && $(target).hasClass('operator')) {
+        state = 'input';
+        let currentNumbers = $('#screen').text();
+        let newNumber = $(target).text();
+        $('#screen').text(currentNumbers + newNumber);
+      }
+      else if (state === 'result') {
         clearDisplay();
         state = 'input';
+        $('#screen').text($(target).text());
       }
-      state = 'input';
-      let currentNumbers = $('#screen').text();
-      let newNumber = $(target).text();
-      $('#screen').text(currentNumbers + newNumber);
+      else if (state === 'input') {
+        let currentNumbers = $('#screen').text();
+        let newNumber = $(target).text();
+        $('#screen').text(currentNumbers + newNumber);
+      }
     }
   })
 })
