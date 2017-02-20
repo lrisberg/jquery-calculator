@@ -19,6 +19,11 @@ $(document).ready(function() {
     $('#screen').text($(target).text());
   }
 
+  function displayError() {
+    ($('#screen')).text('Error');
+    state = 'error';
+  }
+
   function add(firstNumber, secondNumber) {
     return parseInt(firstNumber) + parseInt(secondNumber);
   }
@@ -61,8 +66,7 @@ $(document).ready(function() {
   function displayResult() {
     let expression = ($('#screen').text());
     if (checkFormat(expression) === 'invalid') {
-      ($('#screen')).text('Error');
-      state = 'error';
+      displayError();
 
       return;
     }
@@ -73,8 +77,7 @@ $(document).ready(function() {
     else if (expression.includes('÷')) {
       let result = evaluateExpression(expression, '÷', divide);
       if (isNaN(result)) {
-        ($('#screen')).text('Error');
-        state = 'error';
+        displayError();
 
         return;
       }
@@ -107,17 +110,24 @@ $(document).ready(function() {
     }
 
     else if (target.tagName === 'SPAN') {
+      // allow concatenation of operators, but not numbers, to a result
       if (state === 'result' && $(target).hasClass('operator')) {
         concatToDisplay(target);
         state = 'input';
       }
+
+      // begin new calculation after a result is displayed
       else if (state === 'result') {
         setDisplay(target);
         state = 'input';
       }
+
+      // add number or operator to expression normally
       else if (state === 'input') {
         concatToDisplay(target);
       }
+
+      // begin new calculation after error is displayed
       else if (state === 'error') {
         setDisplay(target);
         state = 'input';
