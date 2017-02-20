@@ -1,7 +1,4 @@
 $(document).ready(function() {
-
-  // ---INITIALIZATION--- //
-
   // ---STATE--- //
 
   let state = 'input';
@@ -24,19 +21,9 @@ $(document).ready(function() {
     return firstNumber / secondNumber;
   }
 
-  function divideNumbers(expression) {
-    let indexOfOperator = expression.indexOf('÷');
-    let firstNumber = expression.substring(0, indexOfOperator);
-    let lastNumber = expression.substring(indexOfOperator + 1);
-    let result = firstNumber / lastNumber;
-
-    return result;
-  }
-
   function evaluateExpression(expression, operator, action) {
-    let indexOfOperator = expression.indexOf(operator);
-    let firstNumber = expression.substring(0, indexOfOperator);
-    let lastNumber = expression.substring(indexOfOperator + 1);
+    let firstNumber = expression.substring(0, expression.indexOf(operator));
+    let lastNumber = expression.substring(expression.indexOf(operator) + 1);
 
     return action(firstNumber, lastNumber);
   }
@@ -45,25 +32,21 @@ $(document).ready(function() {
     $('#screen').text("");
   }
 
-  function updateDisplay() {
+  function displayResult() {
     let expression = ($('#screen').text());
     if (expression.includes('x')) {
-      console.log('That expression was multiplication');
       let result = evaluateExpression(expression, 'x', multiply);
       ($('#screen')).text(result);
     }
     else if (expression.includes('÷')) {
-      console.log('That expression was division');
       let result = evaluateExpression(expression, '÷', divide);
       ($('#screen')).text(result);
     }
     else if (expression.includes('+')) {
-      console.log('That expression was addition');
       let result = evaluateExpression(expression, '+', add);
       ($('#screen')).text(result);
     }
     else if (expression.includes('-')) {
-      console.log('That expression was subtraction');
       let result = evaluateExpression(expression, '-', subtract);
       ($('#screen')).text(result);
     }
@@ -76,41 +59,22 @@ $(document).ready(function() {
     let target = event.target;
 
     if ($(target).text() === 'C') {
-      console.log('You clicked the clear button');
       clearDisplay();
     }
 
     else if ($(target).text() === '=') {
-      console.log('You clicked the equals button');
-      updateDisplay();
+      displayResult();
     }
 
     else if (target.tagName === 'SPAN') {
-      if (state === 'result') {
+      if (state === 'result' && !$(target).hasClass('operator')) {
         clearDisplay();
         state = 'input';
       }
-      console.log('You clicked a', $(target).text());
+      state = 'input';
       let currentNumbers = $('#screen').text();
       let newNumber = $(target).text();
       $('#screen').text(currentNumbers + newNumber);
     }
   })
-
-  // function takeActionOn(person, action) {
-  //   action(person)
-  // }
-  //
-  // let adam = { name: 'Adam' };
-  //
-  // function sayHello(person) {
-  //   console.log("Hello", person.name);
-  // }
-  //
-  // function deleteFromDatabase(person) {
-  //   // do the things
-  // }
-  //
-  // takeActionOn(adam, sayHello);
-
 })
