@@ -32,8 +32,21 @@ $(document).ready(function() {
     $('#screen').text("");
   }
 
+  function concatToDisplay(target) {
+    let currentNumbers = $('#screen').text();
+    let newNumber = $(target).text();
+    $('#screen').text(currentNumbers + newNumber);
+  }
+
+  function setDisplay(target) {
+    $('#screen').text($(target).text());
+  }
+
+  function checkFormat(expression) {
+
+  }
+
   function displayResult() {
-    state = 'result';
     let expression = ($('#screen').text());
     if (expression.includes('x')) {
       let result = evaluateExpression(expression, 'x', multiply);
@@ -41,17 +54,25 @@ $(document).ready(function() {
     }
     else if (expression.includes('÷')) {
       let result = evaluateExpression(expression, '÷', divide);
-      ($('#screen')).text(result);
+      if (isNaN(result)) {
+        ($('#screen')).text('Error');
+        state = 'error';
+
+        return;
+      }
+      else {
+        ($('#screen')).text(result);
+      }
     }
     else if (expression.includes('+')) {
       let result = evaluateExpression(expression, '+', add);
       ($('#screen')).text(result);
-      console.log(result);
     }
     else if (expression.includes('-')) {
       let result = evaluateExpression(expression, '-', subtract);
       ($('#screen')).text(result);
     }
+    state = 'result';
   }
 
   // ---EVENTS--- //
@@ -69,20 +90,19 @@ $(document).ready(function() {
 
     else if (target.tagName === 'SPAN') {
       if (state === 'result' && $(target).hasClass('operator')) {
+        concatToDisplay(target);
         state = 'input';
-        let currentNumbers = $('#screen').text();
-        let newNumber = $(target).text();
-        $('#screen').text(currentNumbers + newNumber);
       }
       else if (state === 'result') {
-        clearDisplay();
+        setDisplay(target);
         state = 'input';
-        $('#screen').text($(target).text());
       }
       else if (state === 'input') {
-        let currentNumbers = $('#screen').text();
-        let newNumber = $(target).text();
-        $('#screen').text(currentNumbers + newNumber);
+        concatToDisplay(target);
+      }
+      else if (state === 'error') {
+        setDisplay(target);
+        state = 'input';
       }
     }
   })
