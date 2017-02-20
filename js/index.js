@@ -5,6 +5,20 @@ $(document).ready(function() {
 
   // ---FUNCTIONS--- //
 
+  function clearDisplay() {
+    $('#screen').text("");
+  }
+
+  function concatToDisplay(target) {
+    let currentNumbers = $('#screen').text();
+    let newNumber = $(target).text();
+    $('#screen').text(currentNumbers + newNumber);
+  }
+
+  function setDisplay(target) {
+    $('#screen').text($(target).text());
+  }
+
   function add(firstNumber, secondNumber) {
     return parseInt(firstNumber) + parseInt(secondNumber);
   }
@@ -28,27 +42,31 @@ $(document).ready(function() {
     return action(firstNumber, lastNumber);
   }
 
-  function clearDisplay() {
-    $('#screen').text("");
-  }
-
-  function concatToDisplay(target) {
-    let currentNumbers = $('#screen').text();
-    let newNumber = $(target).text();
-    $('#screen').text(currentNumbers + newNumber);
-  }
-
-  function setDisplay(target) {
-    $('#screen').text($(target).text());
-  }
-
   function checkFormat(expression) {
-
+    let operators = ['x', '÷', '+', '-']
+    let count = 0;
+    for (let char of expression) {
+      if (operators.includes(char)) {
+        count += 1;
+      }
+    }
+    if (count > 1) {
+      return 'invalid';
+    }
+    else {
+      return 'valid';
+    }
   }
 
   function displayResult() {
     let expression = ($('#screen').text());
-    if (expression.includes('x')) {
+    if (checkFormat(expression) === 'invalid') {
+      ($('#screen')).text('Error');
+      state = 'error';
+
+      return;
+    }
+    else if (expression.includes('x')) {
       let result = evaluateExpression(expression, 'x', multiply);
       ($('#screen')).text(result);
     }
