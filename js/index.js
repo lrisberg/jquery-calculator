@@ -2,6 +2,7 @@ $(document).ready(function() {
   // ---STATE--- //
 
   let state = 'input';
+  let operator = '';
 
   // ---FUNCTIONS--- //
 
@@ -40,14 +41,8 @@ $(document).ready(function() {
     return parseInt(firstNumber) / parseInt(secondNumber);
   }
 
-  function evaluateExpression(expression, operator, action) {
-    let firstNumber = expression.substring(0, expression.indexOf(operator));
-    let lastNumber = expression.substring(expression.indexOf(operator) + 1);
-
-    return action(firstNumber, lastNumber);
-  }
-
   function checkFormat(expression) {
+    // returns 'invalid' if expression has more than one operator
     let operators = ['x', '÷', '+', '-']
     let count = 0;
     for (let char of expression) {
@@ -63,6 +58,13 @@ $(document).ready(function() {
     }
   }
 
+  function evaluateExpression(expression, operator, action) {
+    let firstNumber = expression.substring(0, expression.indexOf(operator));
+    let lastNumber = expression.substring(expression.indexOf(operator) + 1);
+
+    return action(firstNumber, lastNumber);
+  }
+
   function displayResult() {
     let expression = ($('#screen').text());
     if (checkFormat(expression) === 'invalid') {
@@ -76,7 +78,9 @@ $(document).ready(function() {
     }
     else if (expression.includes('÷')) {
       let result = evaluateExpression(expression, '÷', divide);
-      if (isNaN(result)) {
+
+      // display error in case of divide by zero (aka NaN)
+      if (isNaN(result) || result === Infinity) {
         displayError();
 
         return;
