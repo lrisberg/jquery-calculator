@@ -25,19 +25,19 @@ $(document).ready(function() {
   }
 
   function add(firstNumber, secondNumber) {
-    return parseInt(firstNumber) + parseInt(secondNumber);
+    return parseFloat(firstNumber) + parseFloat(secondNumber);
   }
 
   function subtract(firstNumber, secondNumber) {
-    return parseInt(firstNumber) - parseInt(secondNumber);
+    return parseFloat(firstNumber) - parseFloat(secondNumber);
   }
 
   function multiply(firstNumber, secondNumber) {
-    return parseInt(firstNumber) * parseInt(secondNumber);
+    return parseFloat(firstNumber) * parseFloat(secondNumber);
   }
 
   function divide(firstNumber, secondNumber) {
-    return parseInt(firstNumber) / parseInt(secondNumber);
+    return parseFloat(firstNumber) / parseFloat(secondNumber);
   }
 
   function checkFormat(expression) {
