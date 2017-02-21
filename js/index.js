@@ -1,4 +1,14 @@
 $(document).ready(function() {
+  // This calculator is mostly functional with the exception of one known bug
+  // where pressing two operators sequentially displays "Error" concatenated by
+  // the second operator. It should replace the first operator with the new
+  // one. Bug resulted from not planning ahead for all the features I wanted to
+  // add such that the current implementation isn't scalable for easily adding
+  // new features. If I have time to do this over I'd probably rewrite this app
+  // so that it evaluates expressions based on what button was pressed last
+  // instead of evaluating expressions based on what is currently displayed in
+  // the screen.
+
   // ---STATE--- //
 
   let state = 'input';
@@ -40,24 +50,12 @@ $(document).ready(function() {
     return parseFloat(firstNumber) / parseFloat(secondNumber);
   }
 
-  function checkFormat(expression) {
-    // returns 'invalid' if expression has more than one operator
-    let operators = ['x', '÷', '+', '-'];
-    let count = 0;
-    for (let char of expression) {
-      if (operators.includes(char)) {
-        count += 1;
-      }
-    }
-    if (count > 1) {
-      return 'invalid';
-    }
-    else {
-      return 'valid';
-    }
-  }
 
   function checkIfOperatorIsOnScreen() {
+    // Purpose: used to check if an operator is already on the screen.
+    // If one operator is already there, pressing another operator will
+    // evaluate the current expression and apply the second operator to
+    // the result so that operators may be chained together without pressing =
     let expression = $('#screen').text();
     let operators = ['x', '÷', '+', '-'];
     for (let char of expression) {
@@ -69,46 +67,41 @@ $(document).ready(function() {
     return false;
   }
 
+  // evaluates expression in number-(operator)-number format
   function evaluateExpression(expression, operator, action) {
     let firstNumber = expression.substring(0, expression.indexOf(operator));
     let lastNumber = expression.substring(expression.indexOf(operator) + 1);
 
-    return action(firstNumber, lastNumber).toFixed(5);
+    return action(firstNumber, lastNumber);
   }
 
-  function displayResult() {
+  // decides which operator to use to evaluate the expression
+  function discernOperator() {
     let expression = ($('#screen').text());
-    if (checkFormat(expression) === 'invalid') {
-      displayError();
-
-      return;
-    }
-    else if (expression.includes('x')) {
-      let result = evaluateExpression(expression, 'x', multiply);
-      ($('#screen')).text(result);
+    if (expression.includes('x')) {
+      expression = evaluateExpression(expression, 'x', multiply);
     }
     else if (expression.includes('÷')) {
-      let result = evaluateExpression(expression, '÷', divide);
+      expression = evaluateExpression(expression, '÷', divide);
 
-      // display error in case of divide by zero (aka NaN)
-      if (isNaN(result) || result === Infinity) {
-        displayError();
-
-        return;
-      }
-      else {
-        ($('#screen')).text(result);
+      // display error in case of divide by zero (aka NaN/Infinity)
+      if (isNaN(expression) || expression === Infinity) {
+        expression = 'Error';
+        state = 'error';
       }
     }
     else if (expression.includes('+')) {
-      let result = evaluateExpression(expression, '+', add);
-      ($('#screen')).text(result);
+      expression = evaluateExpression(expression, '+', add);
     }
     else if (expression.includes('-')) {
-      let result = evaluateExpression(expression, '-', subtract);
-      ($('#screen')).text(result);
+      expression = evaluateExpression(expression, '-', subtract);
     }
-    state = 'result';
+
+    return expression;
+  }
+
+  function displayResult(result) {
+    ($('#screen')).text(result);
   }
 
   // ---EVENTS--- //
@@ -118,47 +111,41 @@ $(document).ready(function() {
 
     if ($(target).text() === 'C') {
       clearDisplay();
+      state = 'input';
     }
 
     else if ($(target).text() === '=') {
-      displayResult();
+      displayResult(discernOperator());
+      state = 'result';
     }
 
     else if (target.tagName === 'SPAN') {
-      console.log(checkIfOperatorIsOnScreen());
-      console.log('state = ', state);
       // allow concatenation of operators, but not numbers, to a result
       if (state === 'result' && $(target).hasClass('operator')) {
         concatToDisplay(target);
         state = 'input';
-        console.log('first if');
       }
 
       // begin new calculation on pressing a number after a result is displayed
       else if (state === 'result') {
         setDisplay(target);
         state = 'input';
-        console.log('second if');
       }
 
       else if (checkIfOperatorIsOnScreen() && $(target).hasClass('operator')) {
-        console.log(checkIfOperatorIsOnScreen());
-        displayResult();
-        state = 'input';
+        displayResult(discernOperator());
         concatToDisplay(target);
       }
 
       // add number or operator to expression normally
       else if (state === 'input') {
         concatToDisplay(target);
-        console.log('fourth if');
       }
 
       // begin new calculation after error is displayed
       else if (state === 'error') {
         setDisplay(target);
         state = 'input';
-        console.log('fifth if');
       }
     }
   })
