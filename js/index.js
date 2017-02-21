@@ -73,7 +73,7 @@ $(document).ready(function() {
     let firstNumber = expression.substring(0, expression.indexOf(operator));
     let lastNumber = expression.substring(expression.indexOf(operator) + 1);
 
-    return action(firstNumber, lastNumber);
+    return action(firstNumber, lastNumber).toFixed(5);
   }
 
   function displayResult() {
